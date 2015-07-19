@@ -1,10 +1,12 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # Purpose: the algorithm (f_wards) is developed to bulid clusters on conditions and visualise the results on map. 
-# Version: 2.2
-# Last Updated: 12-June-2013
+# Version: 2.3
+# Last Updated: 19-July-2015
 # Supervised by: Jennifer Day    jennieday@gmail.com
 # Coded by: Yiqun(Benny) Chen    chen_yiqun@hotmail.com
 #
+# change logs: v2.3
+# (1) get some robustness with polygon geometry check (checkPolygonsHoles) to aviod orphaned hole issue. Affected funtions: f_run(), f_init_globaldata()
 # change logs: v2.2
 # (1) case insentivte of column names
 # (2) change VC mode processing logic
@@ -551,6 +553,9 @@ f_run <- function(num = -1,
   # uppercase all column names
   colnames(x@data) = toupper(colnames(x@data))
   
+  #get some robustness with polygon geometry check to aviod orphaned hole issue
+  slot(x,"polygons") = lapply(slot(x,"polygons"), checkPolygonsHoles)
+  
   # check if the original data is projected
   # Transform the polygons (which were read in as unprojected geographic coordinates) to an Albers Equal Area projection
   # this is essential since we need calculate distance/area for polygons
@@ -721,6 +726,9 @@ f_init_globaldata <-function(){
     # uppercase all column names
     colnames(gX@data) = toupper(colnames(gX@data))
     
+	#get some robustness with polygon geometry check to aviod orphaned hole issue
+	slot(gX,"polygons") = lapply(slot(gX,"polygons"), checkPolygonsHoles)
+  
     # check if the original data is projected
     # Transform the polygons (which were read in as unprojected geographic coordinates) to an Albers Equal Area projection
     # this is essential since we need calculate distance/area for polygons
