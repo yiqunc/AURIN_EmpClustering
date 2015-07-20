@@ -331,6 +331,8 @@ f_wards <- function(adata, pdata, ianmwh, snswh=c(0.5,0.5), dthresh, proj4string
     # merge two polygons: p(min_idx_i) and p(min_idx_j)
     # step1. handle the geometry data
     tmp_pij = SpatialPolygons(pdata[idx_ij_filter])
+	# do a zero buffer to avoid invalid polygon geometry (needed for 2011 basemap dataset)
+    tmp_pij = gBuffer(tmp_pij, width=0,  byid=TRUE)
     uni_pij = unionSpatialPolygons(tmp_pij, c(1,1))
     uni_pij@polygons[[1]]@ID = paste(GLOBAL_polygon_id_prefix, as.character(GLOBAL_polygon_id_counter), sep="")
     GLOBAL_polygon_id_counter <<- GLOBAL_polygon_id_counter + 1 #change variable outside the function scope
@@ -685,6 +687,8 @@ f_run_globaldata <- function(num = -1,
   if (outDir == "./outputs"){
     outDir = paste(outDir,gDataYear,sep="/")
   }
+  dir.create(outDir, showWarnings=FALSE, recursive=TRUE)
+  
   f_wards(adata=testData, pdata=testPolyList, ianmwh=nmwt, snswh=spatialNonSpatialDistWeights, dthresh=geodisthreshold, proj4string=gOriginal_proj4string, clustnum=targetclusternum, useCentroidDist=useCentroidDist, vcmode = vcmode, outDir=outDir)
 }
 
